@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <title>Update Book</title>
+    
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    
+    <script src="jquery.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function(){
+                
+                $("#searchbyid").click(function(){
+                    $("#searchdiv").show();
+                    $("#searchtype").text("Enter ID");
+                    
+                })
+            })
+    </script>
+       <header>
+            <div class="navbar navbar-inverse navbar-static-top">
+                <div class="container">
+                   <h1 style="color: aqua;text-align: center;float:none">LibraryManageSystem</h1>
+                    <button class="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <div class="collapse navbar-collapse navHeaderCollapse">
+                    <ul class="nav navbar-nav">
+                        <li class="nav active"><a href="#">Home</a></li>
+                        <li class="nav"><a href="#">Book</a></li>
+                        <li class="nav"><a href="#">Author</a></li>
+                        <li class="nav"><a href="#">Publisher</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                       <li class="nav"><a href="#">About</a></li>
+                       <li class="nav"><a href="#">Contact</a></li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+    <body>    
+              <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">GET BOOKS
+                    <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><button id="GetAll"class="btn btn-primary btn-block">ALL</button></li>
+                            <li><button id="GetById"class="btn btn-primary btn-block">By ID</button></li>
+                            <li><button id="GetByitle"class="btn btn-primary btn-block">By Title</button></li>
+                            <li><button id="GetByGenre"class="btn btn-primary btn-block">By Genre</button></li>
+                            <li><button id="GetByAuthor"class="btn btn-primary btn-block">By Author</button></li>
+                            <li><button id="GetByPublisher"class="btn btn-primary btn-block">By Publisher</button></li>
+                            
+                        </ul>
+              </div>
+              
+                  <div id="searchdiv" class="form-group" style="display: none">
+                    <label id="searchtype" class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Enter Title<span style="color: red"> *</span></label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input id='inputTitle' type="text" class="form-control" />
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                        </div>
+                    </div>
+                </div>
+        <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="jquery.js"></script>
+    </body>
+    
+</html>

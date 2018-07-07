@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <title>Form Validations Test</title>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.2/css/bootstrapValidator.min.css"/>
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="jquery.js"></script>
+        <script type="text/javascript"src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.2/js/bootstrapValidator.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                alert("Hello");
+            })
+        </script>
+        
+    </head>
+    <body>
+        <form data-toggle="validator" role="form">
+                  <div class="form-group">
+                    <label for="inputName" class="control-label">Name</label>
+                    <input type="text" class="form-control" id="inputName" placeholder="Cina Saffary" required>
+                  </div>
+                  <div class="form-group has-feedback">
+                    <label for="inputTwitter" class="control-label">Twitter</label>
+                    <div class="input-group">
+                      <span class="input-group-addon">@</span>
+                      <input type="text" pattern="^[_A-z0-9]{1,}$" maxlength="15" class="form-control" id="inputTwitter" placeholder="1000hz" required>
+                    </div>
+                    <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    <div class="help-block with-errors">Hey look, this one has feedback icons!</div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputEmail" class="control-label">Email</label>
+                    <input type="email" class="form-control" id="inputEmail" placeholder="Email" data-error="Bruh, that email address is invalid" required>
+                    <div class="help-block with-errors"></div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputPassword" class="control-label">Password</label>
+                    <div class="form-inline row">
+                      <div class="form-group col-sm-6">
+                        <input type="password" data-minlength="6" class="form-control" id="inputPassword" placeholder="Password" required>
+                        <div class="help-block">Minimum of 6 characters</div>
+                      </div>
+                      <div class="form-group col-sm-6">
+                        <input type="password" class="form-control" id="inputPasswordConfirm" data-match="#inputPassword" data-match-error="Whoops, these don't match" placeholder="Confirm" required>
+                        <div class="help-block with-errors"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="underwear" required>
+                        Boxers
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="underwear" required>
+                        Briefs
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="terms" data-error="Before you wreck yourself" required>
+                        Check yourself
+                      </label>
+                      <div class="help-block with-errors"></div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+        </form>
+         <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+        <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+       
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    </body>
+</html>

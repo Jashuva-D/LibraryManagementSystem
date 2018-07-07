@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Adding the book</title>
+        
+        <!--BOOTSTRAP CSS-->
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        
+        <!--BOOTSTRAP AWESOME CSS-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontawesome/4.1.0/css/font-awesome.min.css" />
+        
+        <!--BOOTSTRAP VALIDATOR CSS-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.0/css/bootstrapValidator.min.css"/>
+        
+        <!--AUTOCOMPLETE CSS-->
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        
+        
+        <!--JQUERY AND BOOTSTRAP JS-->
+        <script src="jQuery/jquery.js"></script>
+        <script type="text/javascript" src="js/LibraryJavaScript.js"></script>
+        <script type="text/javascript" src="js/LibraryCURDoperations.js"></script>
+        <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+        
+        <!--AUCOMPLETE JS-->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!--BOOTSTRAP VALIDATION JS-->
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.0/js/bootstrapValidator.min.js"></script>
+        
+        <!--COOKIES JS FILE-->
+        <script type = "text/javascript" src = "http://cdn.jsdelivr.net/jquery.cookie/1.3.1/jquery.cookie.js"></script>
+       <!-- <script type="text/javascript" src="jquery.cookie.js"></script>-->
+       <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/bootstrapValidator.js"></script>-->
+
+        
+       <!--CUSTOM JS FILE-->
+        <script type="text/javascript">
+            
+            
+            var BookIdForUpdate=
+            $(function (){
+                var queryString=[];
+                if (queryString.length == 0) {
+                        if (window.location.search.split('?').length > 1) {
+                            var params = window.location.search.split('?')[1].split('&');
+                            for (var i = 0; i < params.length; i++) {
+                                var key = params[i].split('=')[0];
+                                var value = decodeURIComponent(params[i].split('=')[1]);
+                                queryString[key] = value;
+                            }
+                   }
+                }
+                
+                BookIDForUpdate=queryString["id"];
+                var url="http://localhost:7070/api/books/"+queryString["id"];
+                $.when(GetData(url)).done(function(book){
+                    setInputsForUpdate(book,queryString["edition"])
+                })
+            })
+            function setInputsForUpdate(book,edition){
+                $("#inputTitle").val(book.Title);
+                $("#selectGenre").val(book.Genre);
+                var authors="";
+                $.each(book.Authors,function(index,author){
+                    if(index>0){
+                        authors += ","
+                    }
+                    authors += author.Name
+                })
+                $("#inputAuthors").val(authors);
+                $("#inputPublisher").val(book.Publisher.Name);
+                
+                var repository;
+                $.each(book.Repositories,function(index,eachrepository){
+                    if(eachrepository.Edition==edition){
+                        repository=eachrepository;
+                    }
+                })
+                $("#inputEdition").val(repository.Edition);
+                $("#inputEdition").prop("disabled",true);
+                $("#inputPrice").val(repository.Price);
+                $("#inputCopies").val(repository.NumberOfCopies);
+            }
+            
+            $(document).ready(function (){
+                
+                var availableAuthors=[];
+                var availablePublishers=[];
+                
+                //Retrieving the Authors from the Database 
+                $.when(GetData("http://localhost:7070/api/authors")).done(function(authors){
+                            if(authors!=null){
+                                addAuthorsToList(authors);  
+                            }
+                            
+                        });
+                
+                //Retrieving the Publishers from the Database
+                $.when(GetData("http://localhost:7070/api/publishers")).done(function(publishers){
+                            if(publishers!=null){
+                               addPublishersToList(publishers);
+                            }
+                            
+                        });
+                
+                
+                //Function to add the authors from the database to the available list of authors
+                function addAuthorsToList(authors){
+                    
+                    $.each(authors,function(index,author){
+                        availableAuthors.push(author.Name);
+                    })
+                    
+                }
+                
+                //Function to add the publishers from the database to the Available list of Publishers
+                function addPublishersToList(publishers){
+                    $.each(publishers,function(index,publisher){
+                           availablePublishers.push(publisher.Name);
+                           });
+                }
+                
+                //Function to split the authors list to each authors for autocomplete purpose
+                function extractLast( term ) {
+                  var arr=term.split(",");
+                  return arr.pop();
+                }
+                
+                //Autocomplete Authors
+                $("#inputAuthors").autocomplete({
+                    
+                    source: function( request, response ) {
+                              // delegate back to autocomplete, but extract the last term
+                              response( $.ui.autocomplete.filter(
+                                availableAuthors,extractLast( request.term ) ) );
+                            },
+                   focus: function(){
+                       
+                       return false;
+                   },
+                    select: function(event,ui){
+                        var authors=this.value.split(",");
+                        authors.pop();
+                        authors.push(ui.item.value);
+                        this.value=authors.join(",")
+                        return false;
+                    }
+                });
+                
+                //Autocomplete Publishers
+                $("#inputPublisher").autocomplete({
+                    source: availablePublishers
+                });
+                
+                //BOOTSTRAP VALIDATIONS 
+                $("#bookform").bootstrapValidator({
+                    feedbackIcons: {
+                        valid: 'glyphicon glyphicon-ok',
+                        invalid: 'glyphicon glyphicon-remove',
+                        validating: 'glyphicon glyphicon-refresh'
+                    },
+                    fields: {
+                        title: {
+                            message: 'The Title is not valid',
+                            validators: {
+                                notEmpty: {
+                                    message: 'The Title is required and cannot be empty'
+                                },
+                                stringLength: {
+                                    min: 6,
+                                    max: 30,
+                                    message: 'The book title must be more than 6 and less than 30 characters long'
+                                }
+
+                            }
+                        },
+                        genre: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'The genre is required and cannot be empty'
+                                }
+                            }
+                        },
+                        authors: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Atleast one author is required'
+                                }
+                            }
+                        },
+                        publisher: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Atleast one publisher is required'
+                                }
+                            }
+                        },
+                        edition: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Please enter book edition if it does not contain please mention 1'
+                                }
+                            }
+                        },
+                        price:{
+                            validators:{
+                                notEmpty:{
+                                    message: 'please enter the price of the book'
+                                },
+                                numeric:{
+                                    message: 'must be integer'
+                                }
+                            }
+                        },
+                        copies:{
+                            validators:{
+                                notEmpty:{
+                                    message: 'Must be not empty'
+                                },
+                                integer:{
+                                    message: 'Must be integer only'
+                                }
+                            }
+                        }
+                      }
+
+                }).on('success.form.bv', function(e) {
+                                 // Prevent form submission
+                                    e.preventDefault();
+
+                                //succes validation
+                                console.log("Valid Data");
+                                var updateBook=GetBookJson();
+                                UpdateBook(updateBook);
+
+                }) .on('err.validator.bv', function (e, data) { 
+                                //validation failed
+                                console.log("Not Valid Data ");
+                                e.preventDefault();    
+                 }).on('err.form.bv', function(e) {
+                            e.preventDefault();
+                            console.log("form error");
+                });
+                
+                
+            })
+        
+        </script>
+                  
+    </head>
+    <header>
+            <div class="navbar navbar-inverse navbar-static-top">
+                <div class="container">
+                   <h1 style="color: aqua;text-align: center;float: none">LibraryManageSystem</h1>
+                    <button class="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <div class="collapse navbar-collapse navHeaderCollapse">
+                    <ul class="nav navbar-nav">
+                        <li class="nav active"><a href="#">Home</a></li>
+                        <li class="nav"><a href="#">Book</a></li>
+                        <li class="nav"><a href="#">Author</a></li>
+                        <li class="nav"><a href="#">Publisher</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                       <li class="nav"><a href="#">About</a></li>
+                       <li class="nav"><a href="#">Contact</a></li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+    <body>
+        
+        <div class="container" style="background-color: sandybrown">
+            <div class="row">
+                <div class="page-header" style="background-color: salmon;">
+                    <h3 style='color: green;text-align: center'>NEW BOOK</h3>
+                </div>
+                <div>
+                    <h3 style="text-align: center; color:cadetblue">Enter Book Details</h3>
+                </div>
+            </div>
+            <div class="row">
+                    <br />
+                    <br />
+
+            <form id="bookform" class="form-horizontal"  role="form" >
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Enter Title</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-book"></span></span>
+                            <input id='inputTitle' type="text" class="form-control" placeholder="Enter Title" name="title" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align:left">Genre</label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-folder-close"></span></span>
+                                <select id='selectGenre' name="genre"class="form-control">
+                                    <option disabled>--Select Genre--</option>
+                                    <option value="Science" >Science</option>
+                                    <option value="SoftwareTechnology">SoftwareTechnology</option>
+                                    <option value="Romance">Romance</option>
+                                    <option value="Literature">Literature</option>
+                                    <option value="Biography">Biography</option>
+                                    <option value="General">General</option>
+                                    <option value="FrontEnd">FrontEnd</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Authors</label>
+                    <div class="col-sm-5">
+                        <div class="input-group"> 
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                        <input id='inputAuthors' name="authors"type="text" class="form-control" placeholder="e.g, Author1,Author2" />    
+                            
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Publisher</label>
+                    <div class="col-sm-5 selectContainer">
+                        <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-print"></span></span>
+                        <input id='inputPublisher' name="publisher" type="text" class="form-control" placeholder="Enter Publisher" />
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Enter Edition</label>
+                    <div class="col-sm-5">
+                        <input id="inputEdition" type="text" name="edition" class="form-control" placeholder="It can be string" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Enter Price</label>
+                    <div class="col-sm-5">
+                        <input id="inputPrice" type="text" name="price"class="form-control" placeholder="Only Numeric values" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 col-sm-offset-1 control-label" style="text-align: left">Enter Number of Copies</label>
+                    <div class="col-sm-5">
+                        <input id="inputCopies" type="number" name="copies"class="form-control" placeholder="Only Integers" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-9 col-sm-offset-3">
+                        <input id='savebutton' type="submit" text="Add" value="Save" class="btn btn-success" />
+                        <input id='resetbutton' type="reset" value="Reset" class="btn btn-warning" />
+                        <a href="GetBooks.html" class="btn btn-danger">Cancel</a>
+                    </div>
+                </div>
+            </form>
+                
+                
+            </div>
+        </div>
+        <!--JQUERY AND BOOTSTRAP JS-->
+        <script src="jQuery/jquery.js"></script>
+        <script type="text/javascript" src="js/LibraryJavaScript.js"></script>
+        <script type="text/javascript" src="js/LibraryCURDoperations.js"></script>
+        <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+        
+        <!--AUTOCOMPLETE JS-->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!--BOOTSTRAP VALIDATION JS-->
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.0/js/bootstrapValidator.min.js"></script>
+        
+        <!--JQuery Cookies-->
+        <script type = "text/javascript" src = "http://cdn.jsdelivr.net/jquery.cookie/1.3.1/jquery.cookie.js"></script>
+      <!--  <script type="text/javascript" src="jquery.cookie.js"></script>-->
+    </body>
+</html>
+        
